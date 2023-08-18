@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import exp from "constants";
 
 const postsDirectory = path.join(process.cwd(), "posts");
 
@@ -19,4 +20,27 @@ export function getSortedPostsData() {
     });
 
     return allPostsData.sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+
+export function getAllPostIds() {
+    const fileNames = fs.readdirSync(postsDirectory);
+
+    return fileNames.map((fileName) => {
+        return {
+            params: {
+                id: fileName.replace(/\.md$/, ""),
+            },
+        };
+    });
+}
+
+export function getPostData(id) {
+    const fullPath = path.join(postsDirectory, `${id}.md`);
+    const filecontents = fs.readFileSync(fullPath, "utf8");
+
+    const matterResult = matter(filecontents);
+    return {
+        id,
+        ...matterResult.data,
+    };
 }
